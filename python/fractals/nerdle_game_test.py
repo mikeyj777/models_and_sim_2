@@ -58,7 +58,6 @@ for i in range(100,1000):
 dig_op = {k: v for k, v in sorted(dig_op.items(), key=lambda item: item[1])}
 
 tot = sum(dig_op.values())
-
 dig_op_freq = {k: v / tot for k, v in dig_op.items()}
 
 for k, v in dig_op_freq.items():
