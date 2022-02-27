@@ -55,6 +55,12 @@ for i in range(100,1000):
         if i / j < 10 and i / j == int(i / j):
             increm_dig_op_key('32/')
 
-for key in dig_op.keys():
-    print(key, dig_op[key])
+dig_op = {k: v for k, v in sorted(dig_op.items(), key=lambda item: item[1])}
+
+tot = sum(dig_op.values())
+
+dig_op_freq = {k: v / tot for k, v in dig_op.items()}
+
+for k, v in dig_op_freq.items():
+    print(k, '{:.1%}'.format(v))
     
