@@ -40,9 +40,9 @@ for i in range(1,len(sstr)+1):
         try:
             if not np.array_equal(perms_2_np, perms_4_arr_first_2_cols_np):
                 if len(perms_4_arr_first_2_cols_np) != len(perms_2_np):
-                    a = 1
+                    breakpoint
                 for i in len(perms_2_np.shape[0]):
                     print(f'2: {perms_2_np[i]}. 4: {perms_4_arr_first_2_cols_np[i]}.')
         except Exception as e:
-            print(i, e.__cause__)
+            print(i, e)
             break
