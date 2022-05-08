@@ -32,6 +32,7 @@ for i in range(1,10):
             if i + j / k >= 10 and i + j / k == int(i + j / k):
                 increm_dig_op_key('111+/', -3)
             
+# *** need to add the 112xx operations (e.g. 6-8+10=8)
 
 #2 numbers:  2 dig operating on 1 dig.  (equals falls at -4 -> 3 dig answer only.  valid for + and *)
 for i in range(10,100):
