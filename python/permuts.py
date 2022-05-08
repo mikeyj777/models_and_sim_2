@@ -1,8 +1,13 @@
-from cgitb import small
 import numpy as np
 import pandas as pd
 from itertools import permutations
 from random import randint
+
+# testing that the first x characters of the set of all permutations contain all possible permutations of the
+# characters given the shorter length
+# 
+# this started as a test of a 4-character string and a 2-character subset.  
+# abstracted now such that "perms_2" reflects a subset and "perms_4" reflects a whole set  
 
 sstr = '123456789'
 
