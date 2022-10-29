@@ -1,10 +1,11 @@
+from cgitb import small
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
 from util import divisorsandnumdivisors, primefactors
 
 def prep_poly(poly):
-    poly = poly.split(",")
+    poly = poly.split(',')
     poly = np.asarray(poly, dtype=float)
     return poly
 
@@ -31,6 +32,19 @@ def poly_div(big_poly, small_poly):
     if len(small_poly) > len(big_poly):
         return 'ERR'
     
+    a = np.asarray(big_poly)
+    b = np.asarray(small_poly)
+    c = []
+
+    working_poly = a
+    for i in range(len(a)-1):
+        if b[i] == 0:
+            c.append(0)
+        else:
+            c.append(a[i] / b[i])
+        carry_poly = c[-1] * b
+        working_poly -= carry_poly
+
     return None
 
 
@@ -55,7 +69,7 @@ if test_rat_roots[0] != 'y' and test_rat_roots[0] != '':
 
 solns = []
 for rrt in rrts:
-    ans = poly_div(big_poly, [1, rrt])
+    ans = poly_div(big_poly, [1, -rrt])
     solns.append(ans)
 
 
