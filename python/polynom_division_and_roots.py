@@ -1,4 +1,5 @@
 import sys
+import copy
 import numpy as np
 import matplotlib.pyplot as plt
 from util import divisorsandnumdivisors, primefactors
@@ -31,12 +32,12 @@ def poly_div(big_poly, small_poly):
     if len(small_poly) > len(big_poly):
         return 'ERR'
     
-    b = np.asarray(big_poly)
+    working_poly = copy.deepcopy(big_poly)
+    working_poly = np.asarray(working_poly)
     s = np.asarray(small_poly)
     s_num_consts = np.count_nonzero(s)
     c = []
 
-    working_poly = b
     while np.count_nonzero(working_poly) >= s_num_consts:
         if working_poly[0] == 0:
             c.append(0)
@@ -49,9 +50,25 @@ def poly_div(big_poly, small_poly):
         working_poly -= carry_poly
         working_poly = working_poly[1:]
 
-    return None
+    if working_poly.sum() > 0:
+        return 'ERR'
 
+    return c
 
+def poly_in_text(p):
+    curr_pow = len(p)-1
+    poly_str = ''
+    for val in p:
+        if val == 0:
+            continue
+        val_txt = f'+ {val}'
+        if val < 0:
+            val_txt = f'- {-val}'
+        x_txt = f' * x ^ {curr_pow}'
+        if curr_pow == 0:
+            x_txt = ''
+        poly_str += f'{val_txt}{x_txt}'
+    
 
 big_poly = input("Enter coefficients of polynomial to be divided:  ")
 big_poly = prep_poly(big_poly)
@@ -71,10 +88,19 @@ if len(test_rat_roots) != 0 and test_rat_roots[0] != 'y':
     
     sys.exit()
 
-solns = []
+solns = {}
 for rrt in rrts:
     ans = poly_div(big_poly, [1, -rrt])
-    solns.append(ans)
+    solns[rrt] = ans
 
+big_poly_txt = poly_in_text(big_poly)
 
+for k,v in solns.items():
+    divisor_txt = poly_in_text([1, -k])
+    output = v
+    if v != 'ERR':
+        output = poly_in_text(v)
+        print(f'the result of polynomial {big_poly_txt} divided by {divisor_txt} is {output}.')
+    else:
+        print(f'the polynomial {big_poly_txt} cannot be evenly divided by {divisor_txt}.')
 
