@@ -34,7 +34,6 @@ def poly_div(big_poly, small_poly):
     b = np.asarray(big_poly)
     s = np.asarray(small_poly)
     s_num_consts = np.count_nonzero(s)
-    diff = len(b) - len(s)
     c = []
 
     working_poly = b
@@ -44,9 +43,11 @@ def poly_div(big_poly, small_poly):
         else:
             c.append(working_poly[0] / s[0])
         carry_poly = c[-1] * s
+        diff = len(working_poly) - len(s)
         if diff > 0:
             carry_poly = np.pad(carry_poly, (0,diff), 'constant', constant_values=(0))
         working_poly -= carry_poly
+        working_poly = working_poly[1:]
 
     return None
 
