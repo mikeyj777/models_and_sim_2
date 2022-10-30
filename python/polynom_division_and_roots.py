@@ -10,8 +10,8 @@ def prep_poly(poly):
     return poly
 
 def rational_root_theorem(poly):
-    an = poly[0]
-    a0 = poly[-1]
+    an = abs(poly[0])
+    a0 = abs(poly[-1])
     ps = divisorsandnumdivisors(a0)[0]
     qs = divisorsandnumdivisors(an)[0]
     rat_roots = []
