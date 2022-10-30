@@ -1,4 +1,3 @@
-from cgitb import small
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
@@ -32,17 +31,21 @@ def poly_div(big_poly, small_poly):
     if len(small_poly) > len(big_poly):
         return 'ERR'
     
-    a = np.asarray(big_poly)
-    b = np.asarray(small_poly)
+    b = np.asarray(big_poly)
+    s = np.asarray(small_poly)
+    s_num_consts = np.count_nonzero(s)
+    diff = len(b) - len(s)
     c = []
 
-    working_poly = a
-    for i in range(len(a)-1):
-        if b[i] == 0:
+    working_poly = b
+    while np.count_nonzero(working_poly) >= s_num_consts:
+        if working_poly[0] == 0:
             c.append(0)
         else:
-            c.append(a[i] / b[i])
-        carry_poly = c[-1] * b
+            c.append(working_poly[0] / s[0])
+        carry_poly = c[-1] * s
+        if diff > 0:
+            carry_poly = np.pad(carry_poly, (0,diff), 'constant', constant_values=(0))
         working_poly -= carry_poly
 
     return None
@@ -58,9 +61,9 @@ print(f'possible roots exist at the following rational values {rrts}.')
 
 test_rat_roots = input('Would you like to test all of them? [Y/n]')
 
-test_rat_roots = test_rat_roots.lower()
+test_rat_roots = test_rat_roots.split()
 
-if test_rat_roots[0] != 'y' and test_rat_roots[0] != '':
+if len(test_rat_roots) != 0 and test_rat_roots[0] != 'y':
     small_poly = input("Enter coefficients of polynomial to divide into first polynomial.  Leave blank to exit: ")
     if small_poly == '':
         sys.exit()
