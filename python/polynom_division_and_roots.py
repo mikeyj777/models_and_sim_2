@@ -56,19 +56,38 @@ def poly_div(big_poly, small_poly):
     return c
 
 def poly_in_text(p):
-    curr_pow = len(p)-1
+    curr_pow = len(p)
     poly_str = ''
+    put_an_operator = False
     for val in p:
         if val == 0:
             continue
-        val_txt = f'+ {val}'
-        if val < 0:
-            val_txt = f'- {-val}'
+        oper = ''
+        if put_an_operator:
+            oper = '+ '
+            if val < 0:
+                oper = '- '
+        else:
+            put_an_operator = True
+        curr_pow -= 1
+        val_txt = f'{oper}{abs(val)}'
+
         x_txt = f' * x ^ {curr_pow}'
         if curr_pow == 0:
             x_txt = ''
-        poly_str += f'{val_txt}{x_txt}'
+        poly_str += f'{val_txt}{x_txt} '
     
+    return f'({poly_str[:-1]})'
+    
+def print_result(big_poly, small_poly, poly_div_output):
+    big_poly_txt = poly_in_text(big_poly)
+    small_poly_txt = poly_in_text(small_poly)
+    v = poly_div_output
+    if v != 'ERR':
+        output = poly_in_text(v)
+        print(f'the result of polynomial {big_poly_txt} divided by {small_poly_txt} is {output}.')
+    else:
+        print(f'the polynomial {big_poly_txt} cannot be evenly divided by {small_poly_txt}.')
 
 big_poly = input("Enter coefficients of polynomial to be divided:  ")
 big_poly = prep_poly(big_poly)
@@ -77,7 +96,7 @@ rrts = rational_root_theorem(big_poly)
 
 print(f'possible roots exist at the following rational values {rrts}.')
 
-test_rat_roots = input('Would you like to test all of them? [Y/n]')
+test_rat_roots = input('Would you like to test all of them? [Y/n] ')
 
 test_rat_roots = test_rat_roots.split()
 
@@ -85,7 +104,10 @@ if len(test_rat_roots) != 0 and test_rat_roots[0] != 'y':
     small_poly = input("Enter coefficients of polynomial to divide into first polynomial.  Leave blank to exit: ")
     if small_poly == '':
         sys.exit()
-    
+    small_poly = prep_poly(small_poly)
+    ans = poly_div(big_poly, small_poly)
+    print_result(big_poly, small_poly, ans)
+
     sys.exit()
 
 solns = {}
@@ -93,14 +115,7 @@ for rrt in rrts:
     ans = poly_div(big_poly, [1, -rrt])
     solns[rrt] = ans
 
-big_poly_txt = poly_in_text(big_poly)
-
 for k,v in solns.items():
     divisor_txt = poly_in_text([1, -k])
-    output = v
-    if v != 'ERR':
-        output = poly_in_text(v)
-        print(f'the result of polynomial {big_poly_txt} divided by {divisor_txt} is {output}.')
-    else:
-        print(f'the polynomial {big_poly_txt} cannot be evenly divided by {divisor_txt}.')
+    print_result(big_poly, [1, -k], v)
 
