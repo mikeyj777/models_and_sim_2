@@ -7,15 +7,17 @@ include_dealer = True
 cards_per_hand = 2
 
 
-class Dealt_Cards(Standard_Deck):
+class Card_Game(Standard_Deck):
 
-    def __init__(self, num_players = 0, include_dealer = False, cards_per_hand = 0):
+    def __init__(self, num_players = 0, include_dealer = False, cards_per_hand = 0, bankroll = 10000, bet=5):
 
         self.num_players = num_players
         self.include_dealer = include_dealer
         self.cards_per_hand = cards_per_hand
         self.hands = []
         self.deck_position = 0
+        self.bankroll = bankroll
+        self.bet = bet
 
         super().__init__(shuffle_it = True)
     
@@ -38,6 +40,8 @@ class Dealt_Cards(Standard_Deck):
         for hand_card in range(cards_per_hand):
             for i in range(hands_to_deal):
                 self.hands[i,hand_card] = self.get_next_card()
+        
+        self.hands = self.hands.tolist()
     
     def get_next_card(self):
 
