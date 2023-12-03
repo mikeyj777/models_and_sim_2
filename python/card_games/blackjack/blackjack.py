@@ -1,3 +1,4 @@
+import copy
 import numpy as np
 import pandas as pd
 
@@ -17,18 +18,27 @@ class Blackjack(Card_Game):
 
     def get_hand_total(self, id):
         tot = 0
-        for i in len(self.hands[id]):
-            card = self.hands[id][i]
-            card_val = card % 13
-            if card_val == 12:
+        hand = copy.deepcopy(self.hands[id])
+        # reduce cards to the equivalent value in lowest suit
+        hand = [x % 13 for x in hand]
+        
+        # sort cards in hand.  This will put aces at end.  The Ace will be counted as 11 unless it forces hand over 21.
+        hand.sort()
+        for i in range(len(hand)):
+            card = hand[i]
+            # 12 is Ace (0 - 12)
+            if card < 12:
+                # 8 is the rank asociated with a '10'.  below here, all hand values are card value (plus 2 here).
+                # above this, values are handled differently
+                if card > 8:
+                    tot += 10
+                else:
+                    tot += (card + 2)
+            if card == 12:
                 tot += 11
                 if tot > self.target:
                     tot -= 10
-            if card_val < 12:
-                if card_val > 8:
-                    tot += 10
-                else:
-                    tot += (card_val + 2)
+        return tot
 
     def set_dealer_showing_card_and_dealer_total_score(self):
         self.dealer_id = len(self.hands) - 1
@@ -44,7 +54,7 @@ class Blackjack(Card_Game):
         if is_dealer:
             tot = self.dealer_total
             if tot >= self.dealer_target:
-                action = 'stay'
+                action = 'stand'
             if tot > self.target:
                 action = 'busted'
             if tot < self.dealer_target:
@@ -53,7 +63,7 @@ class Blackjack(Card_Game):
         tot = self.get_hand_total(id)
         if tot == self.target:
             # I'm at 21.  Time to chill
-            action = 'stay'
+            action = 'stand'
         if tot < self.target:
             # check the strategy to determine next action
             action = None
@@ -63,7 +73,7 @@ class Blackjack(Card_Game):
 
     def play_hand(self, id, action = None):
         
-        if self.dealer_showing_card is None:
+        if self.dealer_id is None:
             self.set_dealer_showing_card_and_dealer_total_score()
 
         if action is not None:
@@ -71,13 +81,19 @@ class Blackjack(Card_Game):
             func(id)
             return
 
-        if id == len(self.hands) - 1:
+        if id == self.dealer_id:
             self.get_action(is_dealer=True)
             func = getattr(self, action)
             func(id)
             return
 
-        hand = self.hands[id]
+        paired = False
+        hand = copy.deepcopy(self.hands[id])
+
+        if len(hand) == 2:
+            hand = [x % 13 for x in hand]
+            if len(set(hand)) == 1:
+                paired = True
 
         hard = True
         for card in hand:
@@ -85,27 +101,29 @@ class Blackjack(Card_Game):
                 hard = False
                 break
 
-        score = sum(hand)
+        score = self.get_hand_total(id)
         bjo = self.bj_optimal_df
         hard_or_soft_df = bjo[bjo['hard'] == hard]
         scores_df = hard_or_soft_df[hard_or_soft_df['score_dealer'] == self.dealer_showing_card]
-        score_df = hard_or_soft_df[scores_df['score'] == score]
-        action = score_df['decision']
-        if not pd.isna(score_df['should_split']):
-            if score_df['should_split']:
-                action = 'split'
+        score_df = scores_df[scores_df['score'] == score]
+        action = score_df['decision'].values[0]
+        if paired:
+            should_split_val = score_df['should_split'].values[0]
+            if not pd.isna(should_split_val):
+                if should_split_val:
+                    action = 'split'
         
         func = getattr(self, action)
         func(id)
 
     def split(self, id):
-        card1a = self.hands[id,0]
+        card1a = self.hands[id][0]
         card1b = self.get_next_card()
         self.hands.append([card1a, card1b])
         id_to_play = len(self.hands) - 1
         self.play_hand(id_to_play)
         self.hands = self.hands[:-1]
-        card2a = self.hands[id,1]
+        card2a = self.hands[id][1]
         card2b = self.get_next_card()
         self.hands.append([card2a, card2b])
         self.play_hand(id_to_play)
@@ -124,9 +142,9 @@ class Blackjack(Card_Game):
         self.bet *= 2
         tot = sum(self.hands[id])
         
-        self.play_hand(id, action = 'stay')
+        self.play_hand(id, action = 'stand')
 
-    def stay(self, id):
+    def stand(self, id):
         tot = sum(self.hands[id])
         # this condition should not exist here.  but, adding it for debug
         if tot > self.target:
