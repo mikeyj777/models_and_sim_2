@@ -14,7 +14,7 @@ class Blackjack(Card_Game):
         self.dealer_stays_at_soft_17 = True
         self.dealer_id = None
         self.stayed_hands = []
-        
+        self.split_hands = {}
 
         super().__init__(num_players = num_players, include_dealer = True, cards_per_hand = 2, bankroll = bankroll, bet = bet)
 
@@ -121,17 +121,24 @@ class Blackjack(Card_Game):
         func(id)
 
     def split(self, id):
+        
         card1a = self.hands[id][0]
         card1b = self.get_next_card()
         self.hands.append([card1a, card1b])
         id_to_play = len(self.hands) - 1
         self.play_hand(id_to_play)
-        self.hands = self.hands[:-1]
+
+        # match the split hand to its id origin.
+        self.split_hands[id_to_play] = id
+        
         card2a = self.hands[id][1]
         card2b = self.get_next_card()
         self.hands.append([card2a, card2b])
+        id_to_play = len(self.hands) - 1
         self.play_hand(id_to_play)
-        self.hands = self.hands[:-1]
+        
+        # match the split hand to its id origin.
+        self.split_hands[id_to_play] = id
 
 
     def hit(self, id):
@@ -150,14 +157,18 @@ class Blackjack(Card_Game):
         self.stayed_hands.append(id)
 
     def payouts_for_stayed_hands(self):
+        
         for id in self.stayed_hands:
             tot = self.get_hand_total(id)
+            id_for_bankroll = id
+            if id in self.split_hands:
+                id_for_bankroll = self.split_hands[id]
             if tot == self.dealer_total:
                 continue
             if tot < self.dealer_total or tot > self.target:
-                self.bankrolls[id] -= self.bets[id]
+                self.bankrolls[id_for_bankroll] -= self.bets[id_for_bankroll]
             else:
-                self.bankrolls[id] += self.bets[id]
+                self.bankrolls[id_for_bankroll] += self.bets[id_for_bankroll]
 
     def busted(self, id):
         self.bankrolls[id] -= self.bets[id]

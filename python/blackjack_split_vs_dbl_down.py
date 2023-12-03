@@ -24,23 +24,28 @@ game.set_dealer_showing_card_and_dealer_total_score()
 
 deck_original_position = game.deck_position
 original_hands = copy.deepcopy(game.hands)
+original_bets = copy.deepcopy(game.bets)
     
 
 results = []
 for i in range(max_iters):
     # split
     game.play_hand(id=0, action = 'split')
-    for n in range(1,len(game.hands)):
+    num_hands = len(game.hands)
+    for n in range(num_hands):
         game.play_hand(id=n)
+    
     
     # optimal strategy
     game.deck_position = deck_original_position
     game.hands = copy.deepcopy(original_hands)
-    for n in range(len(game.hands)):
+    game.bets = copy.deepcopy(original_bets)
+    num_hands = len(game.hands)
+    for n in range(num_hands):
         game.play_hand(id=n)
     
     game.deck_position = deck_original_position
     game.hands = copy.deepcopy(original_hands)
-    
+    game.bets = copy.deepcopy(original_bets)
 
 apple = 1
