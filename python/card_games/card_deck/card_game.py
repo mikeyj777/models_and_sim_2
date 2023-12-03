@@ -16,8 +16,8 @@ class Card_Game(Standard_Deck):
         self.cards_per_hand = cards_per_hand
         self.hands = []
         self.deck_position = 0
-        self.bankroll = bankroll
-        self.bet = bet
+        self.bankrolls = [bankroll] * num_players
+        self.bets = [bet] * num_players
 
         super().__init__(shuffle_it = True)
     

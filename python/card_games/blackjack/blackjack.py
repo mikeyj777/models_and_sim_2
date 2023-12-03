@@ -13,6 +13,8 @@ class Blackjack(Card_Game):
         self.dealer_target = 17
         self.dealer_stays_at_soft_17 = True
         self.dealer_id = None
+        self.stayed_hands = []
+        
 
         super().__init__(num_players = num_players, include_dealer = True, cards_per_hand = 2, bankroll = bankroll, bet = bet)
 
@@ -38,6 +40,8 @@ class Blackjack(Card_Game):
                 tot += 11
                 if tot > self.target:
                     tot -= 10
+        if id == self.dealer_id:
+            self.dealer_total = tot
         return tot
 
     def set_dealer_showing_card_and_dealer_total_score(self):
@@ -82,7 +86,7 @@ class Blackjack(Card_Game):
             return
 
         if id == self.dealer_id:
-            self.get_action(is_dealer=True)
+            action = self.get_action(is_dealer=True)
             func = getattr(self, action)
             func(id)
             return
@@ -90,14 +94,14 @@ class Blackjack(Card_Game):
         paired = False
         hand = copy.deepcopy(self.hands[id])
 
+        hand = [x % 13 for x in hand]
         if len(hand) == 2:
-            hand = [x % 13 for x in hand]
             if len(set(hand)) == 1:
                 paired = True
 
         hard = True
         for card in hand:
-            if card % 13 == 12:
+            if card == 12:
                 hard = False
                 break
 
@@ -139,21 +143,21 @@ class Blackjack(Card_Game):
 
     def double(self, id):
         self.hands[id].append(self.get_next_card())
-        self.bet *= 2
-        tot = sum(self.hands[id])
-        
+        self.bets[id] *= 2
         self.play_hand(id, action = 'stand')
 
     def stand(self, id):
-        tot = sum(self.hands[id])
-        # this condition should not exist here.  but, adding it for debug
-        if tot > self.target:
-            self.bankroll -= self.bet
-        if tot < self.dealer_total:
-            self.bankroll -= self.bet
-        if tot > self.dealer_total:
-            self.bankroll += self.dealer_total
+        self.stayed_hands.append(id)
 
+    def payouts_for_stayed_hands(self):
+        for id in self.stayed_hands:
+            tot = self.get_hand_total(id)
+            if tot == self.dealer_total:
+                continue
+            if tot < self.dealer_total or tot > self.target:
+                self.bankrolls[id] -= self.bets[id]
+            else:
+                self.bankrolls[id] += self.bets[id]
 
     def busted(self, id):
-        self.bankroll -= self.bet
+        self.bankrolls[id] -= self.bets[id]
