@@ -9,7 +9,7 @@ cards_per_hand = 2
 
 class Card_Game(Standard_Deck):
 
-    def __init__(self, num_players = 0, include_dealer = False, cards_per_hand = 0, bankroll = 10000, bet=5):
+    def __init__(self, num_players = 0, include_dealer = False, cards_per_hand = 0, bankroll = 10000, bet=5, debug=False):
 
         self.num_players = num_players
         self.include_dealer = include_dealer
@@ -19,7 +19,7 @@ class Card_Game(Standard_Deck):
         self.bankrolls = [bankroll] * num_players
         self.bets = [bet] * num_players
 
-        super().__init__(shuffle_it = True)
+        super().__init__(shuffle_it = True, debug=debug)
     
     def deal_hands(self, num_players = 0, cards_per_hand = 0, include_dealer = None):
 

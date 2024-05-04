@@ -2,17 +2,23 @@ import numpy as np
 
 class Standard_Deck:
 
-    def __init__(self, shuffle_it = True, cards_to_specify = [], specified_card_locations = []) -> None:
+    def __init__(self, shuffle_it = True, cards_to_specify = [], specified_card_locations = [], debug = False) -> None:
         self.deck = np.arange(52)
+        self.debug = debug
         if shuffle_it:
             self.shuffle()
         self.cards_to_specify = cards_to_specify
         self.specified_card_locations = specified_card_locations
+        
 
         if len(self.cards_to_specify) > 0:
             self.position_cards_for_analysis()
             
     def shuffle(self):
+        seed = None
+        if self.debug:
+            seed = 0
+        np.random.seed(seed=seed)
         for _ in range(7):
             np.random.shuffle(self.deck)
 
