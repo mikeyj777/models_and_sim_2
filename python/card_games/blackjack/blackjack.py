@@ -8,7 +8,7 @@ class Blackjack(Card_Game):
 
     def __init__(self, num_players = 0, bankroll = 10000, bet = 5, debug=False) -> None:
         self.bj_optimal_df = pd.read_csv('python/card_games/blackjack/blackjack_optimal_strategy.csv')
-        self.dealer_showing_card = None
+        self.dealer_up_card = None
         self.target = 21
         self.dealer_target = 17
         self.dealer_stays_at_soft_17 = True
@@ -48,10 +48,10 @@ class Blackjack(Card_Game):
             self.dealer_total = tot
         return tot
 
-    def set_dealer_showing_card_and_dealer_id(self):
+    def set_dealer_up_card_and_dealer_id(self):
         self.dealer_id = len(self.hands) - 1
         dealer_hand = self.hands[len(self.hands) - 1]
-        self.dealer_showing_card = dealer_hand[1]
+        self.dealer_up_card = dealer_hand[1]
     
     def get_action(self, id):
         # id not included when hand is for dealer.
@@ -80,7 +80,7 @@ class Blackjack(Card_Game):
     def play_hand(self, id, action = None):
         
         if self.dealer_id is None:
-            self.set_dealer_showing_card_and_dealer_id()
+            self.set_dealer_up_card_and_dealer_id()
 
         if action is not None:
             func = getattr(self, action)
@@ -112,14 +112,14 @@ class Blackjack(Card_Game):
         score = self.get_hand_total(id)
         bjo = self.bj_optimal_df
         hard_or_soft_df = bjo[bjo['hard'] == hard]
-        scores_df = hard_or_soft_df[hard_or_soft_df['score_dealer'] == self.dealer_showing_card]
+        scores_df = hard_or_soft_df[hard_or_soft_df['score_dealer'] == self.dealer_up_card]
         score_df = scores_df[scores_df['score'] == score]
         action = score_df['decision'].values[0]
         if action == 'double' and len(hand) > 2:
             action = 'hit'
         if paired:
             # testing the benefit of splitting 10s vs a dealer showing targeted card
-            if self.modified and self.dealer_showing_card == self.modification_target:
+            if self.modified and self.dealer_up_card == self.modification_target:
                 if hand[0] > 7 and hand[0] < 12:
                     action = 'split'
             else:

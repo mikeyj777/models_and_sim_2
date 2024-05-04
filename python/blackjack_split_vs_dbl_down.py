@@ -5,7 +5,7 @@ import copy
 
 from card_games.blackjack.blackjack import Blackjack
 
-num_players = 5
+num_players = 1
 max_iters = 1000
 bankroll = 10000
 debug = True
