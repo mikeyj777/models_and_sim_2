@@ -12,7 +12,7 @@ from bots_interacting.circle_bot import Circle_Bot
 pygame.init()
 
 # Set up the screen
-num_circles = 5
+num_circles = 7
 width, height = 800, 600
 circle_radius = 30
 screen = pygame.display.set_mode((width, height))
@@ -29,7 +29,7 @@ bot_colors = [RED, GREEN, BLUE]
 bots = []
 for i in range(num_circles):
     bot_color_id = i % len(bot_colors)
-    cb = Circle_Bot(id=i, env_width=width, env_height=height, radius=circle_radius)
+    cb = Circle_Bot(id=i, env_width=width, env_height=height)
     bots.append(cb)
 
 # Main loop
@@ -45,15 +45,20 @@ while running:
             running = False
 
     # Update circle positions
-    for i in range(len(bots)):
+    i = -1
+    while i < len(bots):
+        i += 1
         bots[i].update_position()
 
         # Check for collisions
-        for n in range(i+1, len(bots)):
+        n = i + 1
+        while n <= len(bots):
             bots[i].check_for_collision_with(bots[n])
-                
-                
-        
+            if bots[n].radius <= 0:
+                bots.pop(n)
+            if bots[i].radius <= 0:
+                bots.pop(i)
+            
         # Bounce off the walls
         bots[i].check_for_nearby_walls()
 
