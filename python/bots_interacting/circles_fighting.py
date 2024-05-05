@@ -2,14 +2,18 @@ import pygame
 import random
 import numpy
 
-from python.bots_interacting.circle_bot import Circle_Bot
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from bots_interacting.circle_bot import Circle_Bot
 
 # Initialize Pygame
 pygame.init()
 
 # Set up the screen
+num_circles = 16
 width, height = 800, 600
-num_circles = 2
 circle_radius = 30
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Bouncing Circles")
@@ -24,7 +28,8 @@ bot_colors = [RED, GREEN, BLUE]
 # Circles rule
 bots = []
 for i in range(num_circles):
-    cb = Circle_Bot(id=i, env_width=width, env_height=height, radius=circle_radius)
+    bot_color_id = i % len(bot_colors)
+    cb = Circle_Bot(id=i, env_width=width, env_height=height, radius=circle_radius, color=bot_colors[bot_color_id])
     bots.append(cb)
 
 # Main loop
@@ -46,7 +51,7 @@ while running:
         # Check for collisions
         for n in range(i+1, len(bots)):
             dist = bots[i].get_distance_to_other_bot(bots[n])
-            if dist <= (2 * circle_radius)**2:
+            if dist <= (2 * circle_radius):
                 # Reverse circle trajectories
                 bots[i].reverse_direction()
                 bots[n].reverse_direction()
@@ -55,9 +60,8 @@ while running:
         bots[i].check_for_nearby_walls()
 
         # Draw circles
-        bot_color_id = i % len(bots)
-        bot_color = bot_colors[bot_color_id]
-        pygame.draw.circle(screen, bot_color, bots[i].position, bots[i].radius)
+        
+        pygame.draw.circle(screen, bots[i].color, bots[i].position, bots[i].radius)
 
     pygame.display.flip()
 
