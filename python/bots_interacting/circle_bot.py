@@ -13,7 +13,7 @@ class Circle_Bot:
         self.max_speed = max_speed
         self.color = color
         self.let_me_uncollide = False
-        self.radius = 30
+        self.radius = None
         self.health = None
         self.damage = None
 
@@ -50,7 +50,7 @@ class Circle_Bot:
     def reverse_direction(self):
         self.velocity = -self.velocity
     
-    def check_for_collision_with(self, other_bot):
+    def check_for_collision_with_other_bot_and_return_response_code(self, other_bot):
         if other_bot is None:
             return
         collision_dist = self.radius + other_bot.radius
@@ -68,7 +68,7 @@ class Circle_Bot:
             
         self.let_me_uncollide = False
         other_bot.let_me_uncollide = False
-        return False
+        return random.randint(1,100)
     
     def react_to_collision(self, other_bot):
         self.let_me_uncollide = True

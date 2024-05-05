@@ -7,12 +7,13 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from bots_interacting.circle_bot import Circle_Bot
+from consts_and_data.consts import Response_Code
 
 # Initialize Pygame
 pygame.init()
 
 # Set up the screen
-num_circles = 7
+num_circles = 2001
 width, height = 800, 600
 circle_radius = 30
 screen = pygame.display.set_mode((width, height))
@@ -52,7 +53,10 @@ while running:
         # Check for collisions
         n = i + 1
         while n < len(bots):
-            bots[i].check_for_collision_with(bots[n])
+            if bots[i].check_for_collision_with_other_bot_and_return_response_code(bots[n]) == Response_Code.MAKE_A_NEW_BOT:
+                num_circles += 1
+                cb = Circle_Bot(id=i, env_width=width, env_height=height)
+                bots.append(cb)
             if bots[n].radius <= 0:
                 bots.pop(n)
             if bots[i].radius <= 0:
