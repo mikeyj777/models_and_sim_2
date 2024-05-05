@@ -1,21 +1,22 @@
 import pygame
 import random
-import numpy
+import numpy as np
 
 import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from bots_interacting.circle_bot import Circle_Bot
-from consts_and_data.consts import Response_Code
+from consts_and_data.consts import RESPONSE_CODE
 
 # Initialize Pygame
 pygame.init()
 
 # Set up the screen
-num_circles = 2001
-width, height = 800, 600
+num_circles = 7
+width, height = 1500, 800
 circle_radius = 30
+max_bot_count = 50
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Bouncing Circles")
 
@@ -53,9 +54,12 @@ while running:
         # Check for collisions
         n = i + 1
         while n < len(bots):
-            if bots[i].check_for_collision_with_other_bot_and_return_response_code(bots[n]) == Response_Code.MAKE_A_NEW_BOT:
+            resp_code = bots[i].check_for_collision_with_other_bot_and_return_response_code(bots[n])
+            if resp_code == RESPONSE_CODE.MAKE_A_NEW_BOT and len(bots) < max_bot_count:
                 num_circles += 1
-                cb = Circle_Bot(id=i, env_width=width, env_height=height)
+                new_pos = bots[i].position
+                new_pos += bots[i].radius * np.array([1,1])
+                cb = Circle_Bot(id=i, env_width=width, env_height=height, position=bots[i].position)
                 bots.append(cb)
             if bots[n].radius <= 0:
                 bots.pop(n)

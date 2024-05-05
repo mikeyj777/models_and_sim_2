@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import IntEnum
 
-class Response_Code(Enum):
+class RESPONSE_CODE(IntEnum):
     MAKE_A_NEW_BOT = 1
