@@ -45,26 +45,26 @@ while running:
             running = False
 
     # Update circle positions
-    i = -1
+    i = 0
     while i < len(bots):
-        i += 1
         bots[i].update_position()
 
         # Check for collisions
         n = i + 1
-        while n <= len(bots):
+        while n < len(bots):
             bots[i].check_for_collision_with(bots[n])
             if bots[n].radius <= 0:
                 bots.pop(n)
             if bots[i].radius <= 0:
                 bots.pop(i)
-            
+            n += 1
         # Bounce off the walls
         bots[i].check_for_nearby_walls()
 
         # Draw circles
-        
         pygame.draw.circle(screen, bots[i].color, bots[i].position, bots[i].radius)
+
+        i += 1
 
     pygame.display.flip()
 

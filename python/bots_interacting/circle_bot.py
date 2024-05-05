@@ -13,7 +13,7 @@ class Circle_Bot:
         self.max_speed = max_speed
         self.color = color
         self.let_me_uncollide = False
-        self.radius = None
+        self.radius = 30
         self.health = None
         self.damage = None
 
@@ -41,7 +41,7 @@ class Circle_Bot:
     
     def set_health_damage_and_radius(self):
         self.health = random.randint(10, 100)
-        self.damage = random.randint(1, 10)
+        self.damage = random.randint(1, 50)
         self.update_hit_points_and_radius()
         
     def update_position(self):
@@ -51,6 +51,8 @@ class Circle_Bot:
         self.velocity = -self.velocity
     
     def check_for_collision_with(self, other_bot):
+        if other_bot is None:
+            return
         collision_dist = self.radius + other_bot.radius
         dist = np.linalg.norm(self.position - other_bot.position)
         if self.let_me_uncollide:
@@ -73,6 +75,7 @@ class Circle_Bot:
         other_bot.let_me_uncollide = True
         self.reverse_direction()
         other_bot.reverse_direction()
+        self.update_hit_points_and_radius(other_bot)
 
     def check_for_nearby_walls(self):
 
@@ -86,7 +89,9 @@ class Circle_Bot:
             damage_taken = other_bot.damage
         self.health -= damage_taken
         self.health = max(0, self.health)
-        self.radius = self.health // 10
+        self.radius = self.health
+        if other_bot is not None:
+            other_bot.update_hit_points_and_radius()
 
 
 
