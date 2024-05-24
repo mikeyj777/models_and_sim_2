@@ -2,11 +2,12 @@ import numpy as np
 
 class Standard_Deck:
 
-    def __init__(self, shuffle_it = True, cards_to_specify = [], specified_card_locations = [], debug = False) -> None:
+    def __init__(self, shuffle_it = True, cards_to_specify = [], specified_card_locations = [], debug = False, num_shuffles = 7) -> None:
         self.deck = np.arange(52)
         self.debug = debug
+        self.num_shuffles = num_shuffles
         if shuffle_it:
-            self.shuffle()
+            self.shuffle(self.num_shuffles)
         self.cards_to_specify = cards_to_specify
         self.specified_card_locations = specified_card_locations
         
@@ -14,12 +15,12 @@ class Standard_Deck:
         if len(self.cards_to_specify) > 0:
             self.position_cards_for_analysis()
             
-    def shuffle(self):
+    def shuffle(self, num_shuffles = 7):
         seed = None
         if self.debug:
             seed = 0
         np.random.seed(seed=seed)
-        for _ in range(7):
+        for _ in range(num_shuffles):
             np.random.shuffle(self.deck)
 
 
